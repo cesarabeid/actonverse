@@ -86,7 +86,7 @@ function get_post_title_from_tag($tag_id) {
         }
     }
 
-    // Return null if no corresponding post is found
+    // Return null if no corresponding post is found brotha
     return null;
 }
 
