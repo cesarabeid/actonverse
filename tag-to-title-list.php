@@ -41,6 +41,6 @@ function add_titles_of_tagged_posts($content) {
     $titles_string = implode(', ', $titles);
 
     // Add this string to the top of the post content
-    return $titles_string ? "<p>Related Posts: $titles_string</p>" . $content : $content;
+    return $titles_string ? "<p>Parent Actons: $titles_string</p>" . $content : $content;
 }
 
