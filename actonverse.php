@@ -1,7 +1,6 @@
 <?php
 /**
  * Plugin Name: Actonverse
- * Description: For each post, adds a line at the top listing titles of posts corresponding to its tags.
  * Version: 1.0
  * Author: Cesar Abeid
  */
