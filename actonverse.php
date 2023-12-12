@@ -62,3 +62,31 @@ function create_post_id_tag($post_ID, $post) {
         );
     }
 }
+
+/**
+ * Retrieves the post title for a given tag ID, where the tag name is a numeric Post ID.
+ *
+ * @param int $tag_id The ID of the tag.
+ * @return string|null The post title, or null if no corresponding post is found.
+ */
+function get_post_title_from_tag($tag_id) {
+    // Retrieve the tag details
+    $tag = get_term_by('id', $tag_id, 'post_tag');
+
+    // Check if the tag exists and its name is numeric
+    if ($tag && is_numeric($tag->name)) {
+        $post_id = intval($tag->name);
+
+        // Get the post by ID
+        $post = get_post($post_id);
+
+        // Return the post title if the post exists
+        if ($post) {
+            return $post->post_title;
+        }
+    }
+
+    // Return null if no corresponding post is found
+    return null;
+}
+
