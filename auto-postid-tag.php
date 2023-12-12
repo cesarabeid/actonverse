@@ -24,8 +24,5 @@ function create_post_id_tag($post_ID, $post) {
             'post_tag'         // The taxonomy (in this case, tags)
         );
     }
-
-    // Assign the tag to the post
-    wp_set_post_tags($post_ID, (string) $post_ID, true);
 }
 
