@@ -44,7 +44,7 @@ function post_references_meta_box_callback($post) {
 
     $selected_posts = get_post_meta($post->ID, '_post_references', true) ?: array();
 
-    echo '<label for="post_references_field">Select Posts:</label>';
+    echo '<label for="post_references_field">Select Parent Actons:</label>';
     echo '<select id="post_references_field" name="post_references_field[]" multiple="multiple" style="width:100%;max-width:250px;height:100px;">';
 
     $args = array(
