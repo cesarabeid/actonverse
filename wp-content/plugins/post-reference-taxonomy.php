@@ -42,9 +42,10 @@ function post_references_meta_box_callback($post) {
     // Add a nonce field so we can check for it later.
     wp_nonce_field('post_references_meta_box', 'post_references_meta_box_nonce');
 
-    echo '<label for="post_references_field">Select a Post:</label>';
-    echo '<select id="post_references_field" name="post_references_field">';
-    echo '<option value="">None</option>';
+    $selected_posts = get_post_meta($post->ID, '_post_references', true) ?: array();
+
+    echo '<label for="post_references_field">Select Posts:</label>';
+    echo '<select id="post_references_field" name="post_references_field[]" multiple="multiple" style="width:100%;max-width:250px;height:100px;">';
 
     $args = array(
         'posts_per_page' => -1,
@@ -54,11 +55,13 @@ function post_references_meta_box_callback($post) {
     );
     $posts = get_posts($args);
     foreach ($posts as $ref_post) {
-        echo '<option value="' . esc_attr($ref_post->ID) . '">' . esc_html($ref_post->post_title) . '</option>';
+        $selected = in_array($ref_post->ID, $selected_posts) ? ' selected' : '';
+        echo '<option value="' . esc_attr($ref_post->ID) . '"' . $selected . '>' . esc_html($ref_post->post_title) . '</option>';
     }
 
     echo '</select>';
 }
+
 
 add_action('save_post', 'save_post_references');
 
@@ -79,6 +82,7 @@ function save_post_references($post_id) {
         return;
     }
 
-    $post_references = sanitize_text_field($_POST['post_references_field']);
-    wp_set_post_terms($post_id, array($post_references), 'post_references', false);
+    $post_references = array_map('sanitize_text_field', $_POST['post_references_field']);
+    update_post_meta($post_id, '_post_references', $post_references);
 }
+
