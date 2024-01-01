@@ -35,7 +35,7 @@ function register_post_references_taxonomy() {
 add_action('add_meta_boxes', 'add_post_references_meta_box');
 
 function add_post_references_meta_box() {
-    add_meta_box('post-references-meta-box', 'Post References', 'post_references_meta_box_callback', 'post', 'side');
+    add_meta_box('post-references-meta-box', 'Parent Actons', 'post_references_meta_box_callback', 'post', 'side');
 }
 
 function post_references_meta_box_callback($post) {
