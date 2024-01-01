@@ -62,8 +62,48 @@ function post_references_meta_box_callback($post) {
     echo '</select>';
 }
 
+add_action('add_meta_boxes', 'add_custom_fields_meta_box');
 
-add_action('save_post', 'save_post_references');
+function add_custom_fields_meta_box() {
+    add_meta_box('custom-fields-meta-box', 'Custom Fields', 'custom_fields_meta_box_callback', 'post', 'side');
+}
+
+function custom_fields_meta_box_callback($post) {
+    wp_nonce_field('custom_fields_meta_box', 'custom_fields_meta_box_nonce');
+
+    // Owner Field
+    $owner = get_post_meta($post->ID, '_owner', true);
+    $users = get_users(array('fields' => array('ID', 'display_name')));
+    echo '<p><label for="owner_field">Owner:</label>';
+    echo '<select id="owner_field" name="owner_field">';
+    echo '<option value="">Select a User</option>';
+    foreach ($users as $user) {
+        echo '<option value="' . esc_attr($user->ID) . '"' . selected($owner, $user->ID) . '>' . esc_html($user->display_name) . '</option>';
+    }
+    echo '</select></p>';
+    
+    // Start Time Field
+    $start_time = get_post_meta($post->ID, '_start_time', true);
+    echo '<p><label for="start_time_field">Start Time:</label>';
+    echo '<input type="datetime-local" id="start_time_field" name="start_time_field" value="' . esc_attr($start_time) . '" /></p>';
+
+    // End Time Field
+    $end_time = get_post_meta($post->ID, '_end_time', true);
+    echo '<p><label for="end_time_field">End Time:</label>';
+    echo '<input type="datetime-local" id="end_time_field" name="end_time_field" value="' . esc_attr($end_time) . '" /></p>';
+
+    // Status Field
+    $status = get_post_meta($post->ID, '_status', true);
+    echo '<p><label for="status_field">Status:</label>';
+    echo '<select id="status_field" name="status_field">';
+    echo '<option value="not_done"' . selected($status, 'not_done', false) . '>Not Done</option>';
+    echo '<option value="in_progress"' . selected($status, 'in_progress', false) . '>In Progress</option>';
+    echo '<option value="done"' . selected($status, 'done', false) . '>Done</option>';
+    echo '</select></p>';
+}
+
+
+add_action('save_post', 'save_post_references', 'save_custom_fields_data');
 
 function save_post_references($post_id) {
     if (!isset($_POST['post_references_meta_box_nonce'])) {
@@ -85,4 +125,42 @@ function save_post_references($post_id) {
     $post_references = array_map('sanitize_text_field', $_POST['post_references_field']);
     update_post_meta($post_id, '_post_references', $post_references);
 }
+
+add_action('save_post', 'save_custom_fields_data');
+
+function save_custom_fields_data($post_id) {
+    if (!isset($_POST['custom_fields_meta_box_nonce'])) {
+        return;
+    }
+    if (!wp_verify_nonce($_POST['custom_fields_meta_box_nonce'], 'custom_fields_meta_box')) {
+        return;
+    }
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        return;
+    }
+    if (!current_user_can('edit_post', $post_id)) {
+        return;
+    }
+
+    // Save Owner
+    if (isset($_POST['owner_field'])) {
+        update_post_meta($post_id, '_owner', sanitize_text_field($_POST['owner_field']));
+    }
+
+    // Save Start Time
+    if (isset($_POST['start_time_field'])) {
+        update_post_meta($post_id, '_start_time', sanitize_text_field($_POST['start_time_field']));
+    }
+
+    // Save End Time
+    if (isset($_POST['end_time_field'])) {
+        update_post_meta($post_id, '_end_time', sanitize_text_field($_POST['end_time_field']));
+    }
+
+    // Save Status
+    if (isset($_POST['status_field'])) {
+        update_post_meta($post_id, '_status', sanitize_text_field($_POST['status_field']));
+    }
+}
+
 
